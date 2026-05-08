@@ -71,6 +71,15 @@ class ContentVersionRepository:
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
+    async def list_by_status(self, status: str) -> list[ContentVersion]:
+        stmt = (
+            select(ContentVersion)
+            .where(ContentVersion.status == status)
+            .order_by(ContentVersion.created_at.desc())
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_latest_version_number(self, news_item_id: int, platform: str) -> int:
         stmt = (
             select(func.max(ContentVersion.version_number))

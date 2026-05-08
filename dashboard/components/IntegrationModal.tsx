@@ -98,13 +98,20 @@ curl_close($ch);
     showToast("Code snippet copied to clipboard");
   };
 
-  const handleConnectSocial = (platform: string) => {
-    // Simulate OAuth popup delay for prototype
-    showToast(`Connecting to ${platform}...`);
-    setTimeout(() => {
-      setConnectedSocials(prev => ({ ...prev, [platform]: true }));
-      showToast(`${platform} successfully connected!`);
-    }, 1500);
+  const handleConnectSocial = async (platform: string) => {
+    showToast(`Generating secure link for ${platform}...`);
+    try {
+      const res = await fetch(getApiUrl('/integrations/ayrshare/profile-link'));
+      const data = await res.json();
+      if (data.url) {
+        window.open(data.url, '_blank');
+        setConnectedSocials(prev => ({ ...prev, [platform]: true }));
+      } else {
+        showToast("Failed to generate link", "error");
+      }
+    } catch (err) {
+      showToast("Connection error", "error");
+    }
   };
 
   return (

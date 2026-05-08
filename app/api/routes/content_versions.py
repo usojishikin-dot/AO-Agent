@@ -105,3 +105,41 @@ async def list_versions_for_news_item(
         )
         for item in items
     ]
+
+@router.get(
+    "/content-versions",
+    response_model=list[ContentVersionResponse],
+)
+async def list_content_versions(
+    status: str | None = None,
+    session: AsyncSession = Depends(get_db_session),
+) -> list[ContentVersionResponse]:
+    """
+    Returns content versions, optionally filtered by status (e.g. GENERATED, PUBLISHED).
+    """
+    repo = ContentVersionRepository(session)
+    if status:
+        items = await repo.list_by_status(status.upper())
+    else:
+        # Just return empty or all; for now we only need filtered by status.
+        return []
+
+    return [
+        ContentVersionResponse(
+            id=item.id,
+            news_item_id=item.news_item_id,
+            platform=item.platform,
+            version_number=item.version_number,
+            content_text=item.content_text,
+            status=item.status,
+            evaluation_score=item.evaluation_score,
+            brand_score=item.brand_score,
+            human_likeness_score=item.human_likeness_score,
+            platform_compliance_score=item.platform_compliance_score,
+            evaluation_feedback=item.evaluation_feedback,
+            approved_by_human=item.approved_by_human,
+            ayrshare_post_id=item.ayrshare_post_id,
+            published_at=item.published_at,
+        )
+        for item in items
+    ]

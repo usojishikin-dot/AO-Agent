@@ -4,6 +4,8 @@ import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import Toast from "@/components/Toast";
 
+import AuthProvider from "@/components/AuthProvider";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,13 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <div className="app-container">
-          <Sidebar />
-          <main className="main-content">
-            {children}
-            <Toast />
-          </main>
-        </div>
+        <AuthProvider>
+          <div className="app-container">
+            <Sidebar />
+            <main className="main-content">
+              {children}
+              <Toast />
+            </main>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

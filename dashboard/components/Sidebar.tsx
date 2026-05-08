@@ -15,14 +15,14 @@ import {
   Settings
 } from 'lucide-react';
 import { showToast } from '@/lib/toast';
+import { useSession, signOut } from 'next-auth/react';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const toggleSidebar = (e?: React.MouseEvent | React.HTMLAttributes<HTMLButtonElement>) => {
-    // We remove preventDefault to ensure the event flows naturally on mobile
-    console.log("Toggle Sidebar Triggered");
     setIsOpen(prev => !prev);
   };
 
@@ -56,14 +56,14 @@ const Sidebar = () => {
               <Home size={18} className={styles.icon} />
               Dashboard
             </Link>
-            <a href="#" className={styles.navLink} onClick={(e) => handleComingSoon(e, 'Queue')}>
+            <Link href="/queue" className={`${styles.navLink} ${pathname === '/queue' ? styles.active : ''}`} onClick={() => setIsOpen(false)}>
               <List size={18} className={styles.icon} />
               Queue
-            </a>
-            <a href="#" className={styles.navLink} onClick={(e) => handleComingSoon(e, 'Published')}>
+            </Link>
+            <Link href="/published" className={`${styles.navLink} ${pathname === '/published' ? styles.active : ''}`} onClick={() => setIsOpen(false)}>
               <CheckCircle size={18} className={styles.icon} />
               Published
-            </a>
+            </Link>
           </div>
           
           <div className={styles.navSection}>
@@ -88,13 +88,25 @@ const Sidebar = () => {
         </nav>
         
         <div className={styles.footer}>
-          <div className={styles.userProfile}>
-            <div className={styles.avatar}>M</div>
-            <div className={styles.userInfo}>
-              <p className={styles.userName}>Memmun</p>
-              <p className={styles.userRole}>Admin</p>
+          {session ? (
+            <div className={styles.userProfile} onClick={() => signOut()} style={{ cursor: 'pointer' }}>
+              <div className={styles.avatar}>{session.user?.name?.[0] || session.user?.email?.[0]?.toUpperCase() || 'U'}</div>
+              <div className={styles.userInfo}>
+                <p className={styles.userName}>{session.user?.name || session.user?.email}</p>
+                <p className={styles.userRole}>Sign Out</p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <Link href="/login" style={{ textDecoration: 'none' }}>
+              <div className={styles.userProfile} style={{ cursor: 'pointer' }}>
+                <div className={styles.avatar}>?</div>
+                <div className={styles.userInfo}>
+                  <p className={styles.userName}>Guest</p>
+                  <p className={styles.userRole}>Sign In</p>
+                </div>
+              </div>
+            </Link>
+          )}
         </div>
       </aside>
       
