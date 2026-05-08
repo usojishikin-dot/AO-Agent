@@ -1,0 +1,96 @@
+# ============================================================
+# Brand Bible — Enterprise AI Social Media Factory
+# Paste your brand guidelines below in the relevant sections.
+# This file is loaded by the AI pipeline at startup and injected
+# into every generation and evaluation prompt automatically.
+# ============================================================
+
+brand:
+  name: "Global Development & Impact Organization"
+  tagline: "Driving partnerships, funding, and impact for sustainable development"
+  website: ""
+
+voice_and_tone:
+  primary_tone: "professional, authoritative, and clear"
+  secondary_tone: "inspiring, collaborative, and impact-driven"
+  personality_traits:
+    - "trustworthy"
+    - "strategic"
+    - "impact-focused"
+    - "collaborative"
+    - "forward-thinking"
+  writing_style: "clear and structured sentences, mix of short and medium length, active voice, minimal jargon, high readability with natural human tone"
+
+audience:
+  primary: "organizations, institutions, development agencies, and decision-makers involved in funding, partnerships, and social impact initiatives"
+  secondary: "international partners, stakeholders, media, and community-focused audiences"
+  pain_points:
+    - "difficulty accessing funding and strategic partnerships"
+    - "inefficient communication of impact and initiatives"
+    - "lack of visibility for development projects"
+    - "fragmented collaboration across regions and stakeholders"
+  desires:
+    - "scalable and sustainable development solutions"
+    - "strong and credible partnerships"
+    - "increased visibility and engagement"
+    - "measurable impact and growth"
+
+messaging:
+  core_message: "We connect resources, partnerships, and opportunities to drive sustainable development and meaningful impact."
+  key_differentiators:
+    - "strong focus on global partnerships and international linkage"
+    - "integrated approach combining fundraising, development, and communication"
+    - "commitment to measurable and sustainable impact"
+    - "professional and structured execution of initiatives"
+  mandatory_facts:
+    - "all claims must be accurate, verifiable, and not exaggerated"
+    - "impact statements must reflect real outcomes or clearly stated projections"
+    - "partnerships must not be misrepresented"
+
+prohibited:
+  words:
+    - "cheap"
+    - "easy money"
+    - "guaranteed"
+    - "get rich"
+    - "instant success"
+  phrases:
+    - "click here"
+    - "limited time only" 
+    - "act now!!!"
+    - "don’t miss out"
+    - "best in the world"
+  topics:
+    - "political commentary"
+    - "competitor comparisons"
+    - "misleading fundraising claims"
+    - "unverified statistics"
+    - "sensitive or controversial narratives without context"
+
+calls_to_action:
+  primary_cta: "Support this initiative and be part of the impact"
+  secondary_cta: "Learn more about our work and partnerships"
+  cta_url: ""
+
+hashtag_policy:
+  max_hashtags_x: 3
+  max_hashtags_linkedin: 5
+  max_hashtags_facebook: 2
+  approved_hashtags:
+    - "#SustainableDevelopment"
+    - "#GlobalImpact"
+    - "#PartnershipForGrowth"
+    - "#CommunityDevelopment"
+    - "#ImpactDriven"
+    - "#DevelopmentGoals"
+
+platform_notes:
+  x:
+    style: "strong hook in the first line, concise messaging, focus on impact or key insight, may use threads for extended communication"
+    emoji_use: "minimal use, 0–1 emojis, placed at the end if necessary"
+  linkedin:
+    style: "professional and insight-driven, storytelling format, structured with whitespace, ends with a reflective or engagement question"
+    emoji_use: "very subtle use, avoid overuse, maintain professionalism"
+  facebook:
+    style: "conversational and community-focused, clear messaging, ends with a direct engagement question"
+    emoji_use: "friendly use, up to 2–3 emojis, used naturally within the text"

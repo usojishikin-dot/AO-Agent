@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: content-factory-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: ohio
+    plan: free
+    envVars:
+      - key: LOG_LEVEL
+        value: INFO
+      - key: WEBHOOK_BEARER_TOKEN
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: AYRSHARE_API_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: MOCK_PUBLISHING
+        value: "True"
