@@ -8,12 +8,21 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-GEMINI_FLASH_MODEL = "gemini-2.5-flash"  # gemini-2.5-pro has 0 free-tier quota
+GEMINI_FLASH_MODEL = "gemini-2.5-flash"
+GEMINI_PRO_MODEL = "gemini-2.5-pro"
+
 MAX_RETRIES = 3
 
 _PLATFORM_CONSTRAINTS = {
     "x": "≤280 characters total, strong hook, 0–1 emojis, 1–3 hashtags, punchy and concise",
-    "linkedin": "150–300 words, professional tone, storytelling format, ends with engagement question, 3–5 hashtags",
+    "linkedin_company": (
+        "150–300 words, professional and brand-focused, uses 'We'/'Our'/brand name (NOT first-person 'I'), "
+        "storytelling format, ends with an engagement question, 3–5 hashtags"
+    ),
+    "linkedin_personal": (
+        "150–300 words, thought-leadership tone, MUST use first-person ('I'/'My'/'In my view'), "
+        "opens with a visionary or contrarian hook, ends with a personal reflection or call-to-action, 3–5 hashtags"
+    ),
     "facebook": "80–150 words, conversational and community-focused, ends with a question, 1–2 hashtags, 2–3 emojis",
 }
 
@@ -39,7 +48,8 @@ Return ONLY a valid JSON object — no markdown fences, no explanation:
   "brand_score": 0.00,
   "human_likeness_score": 0.00,
   "platform_compliance_score": 0.00,
-  "feedback": "Brief strengths and improvement notes (max 80 words)"
+  "feedback": "Brief strengths and improvement notes (max 80 words)",
+  "refinement_instructions": "Specific instructions for the writer to fix the issues identified above. Be concise and actionable."
 }}
 """
 
@@ -51,6 +61,7 @@ class EvaluationResult:
     platform_compliance_score: float
     overall_score: float
     feedback: str
+    refinement_instructions: str | None
     passed: bool
 
 
@@ -84,6 +95,7 @@ async def evaluate_post(
         platform_compliance_score=compliance,
         overall_score=overall,
         feedback=data.get("feedback", ""),
+        refinement_instructions=data.get("refinement_instructions") or data.get("feedback"),
         passed=passed,
     )
 

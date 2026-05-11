@@ -39,12 +39,21 @@ def _platform_constraints(bible: dict) -> dict[str, dict[str, str]]:
             "style": pn.get("x", {}).get("style", "strong hook, concise, impactful"),
             "emoji": pn.get("x", {}).get("emoji_use", "0–1 emojis max"),
         },
-        "linkedin": {
+        "linkedin_company": {
             "char_limit": "150–300 words",
             "length_guide": "medium, insight-driven",
             "hashtag_rule": f"max {hp.get('max_hashtags_linkedin', 5)} hashtags — choose from: {approved}",
-            "style": pn.get("linkedin", {}).get("style", "professional storytelling, end with a question"),
+            "style": pn.get("linkedin", {}).get("style", "professional storytelling, brand-focused, use 'We'/'Our', end with a question"),
             "emoji": pn.get("linkedin", {}).get("emoji_use", "very subtle use"),
+            "voice_directive": "Write from the brand's collective perspective. Use 'We', 'Our team', or the organization's name. Polished, authoritative, and brand-aligned.",
+        },
+        "linkedin_personal": {
+            "char_limit": "150–300 words",
+            "length_guide": "medium, thought-leadership",
+            "hashtag_rule": f"max {hp.get('max_hashtags_linkedin', 5)} hashtags — choose from: {approved}",
+            "style": "Thought-leadership, first-person narrative using 'I'/'My', open with a visionary or contrarian hook, end with a personal reflection or call-to-action",
+            "emoji": pn.get("linkedin", {}).get("emoji_use", "very subtle use"),
+            "voice_directive": "Write from the CEO/Founder's personal perspective. Use 'I', 'My', 'In my view'. Be opinionated, visionary, and direct. This is a personal post, not a brand post.",
         },
         "facebook": {
             "char_limit": "80–150 words",
@@ -83,6 +92,27 @@ CRITICAL RULES:
 - Return ONLY the post text — no labels, no markdown, no explanation
 """
 
+_REFINE_PROMPT = """\
+You are an expert social media copywriter. You have been asked to refine a {platform_upper} post based on specific feedback.
+
+ORIGINAL POST:
+{original_text}
+
+FEEDBACK/REFINEMENT INSTRUCTIONS:
+{refinement_instructions}
+
+{platform_upper} PLATFORM REQUIREMENTS:
+- Length: {char_limit} ({length_guide})
+- Hashtags: {hashtag_rule}
+- Style: {style}
+- Emoji usage: {emoji}
+
+CRITICAL RULES:
+- Fix the issues mentioned in the feedback while maintaining the core message.
+- Maintain a natural, human tone.
+- Return ONLY the refined post text — no labels, no markdown, no explanation.
+"""
+
 
 async def _generate_one(
     platform: str,
@@ -94,8 +124,12 @@ async def _generate_one(
     c = constraints[platform]
     key_points_formatted = "\n".join(f"  • {p}" for p in outline.key_points)
     mandatory_facts = str(outline.mandatory_facts) if outline.mandatory_facts else "None"
-    
-    # Fetch Voice Memory
+
+    # Voice directive is an optional extra instruction injected for LinkedIn variants
+    voice_directive = c.get("voice_directive", "")
+    voice_directive_block = f"\nVOICE DIRECTIVE:\n{voice_directive}\n" if voice_directive else ""
+
+    # Fetch Voice Memory (fall back gracefully if platform key not yet in DB)
     voice_memory_text = "None available yet."
     try:
         async with AsyncSessionLocal() as session:
@@ -119,7 +153,7 @@ async def _generate_one(
         style=c["style"],
         emoji=c["emoji"],
         voice_memory=voice_memory_text,
-    )
+    ) + voice_directive_block
 
     text = await groq_generate(prompt, GROQ_MODEL)
     text = text.strip()
@@ -140,13 +174,14 @@ async def generate_all_platforms(
     outline: MasterOutline,
     trace_id: str,
 ) -> dict[str, str]:
-    """Generate posts for X, LinkedIn, and Facebook concurrently."""
+    """Generate posts for X, LinkedIn Company, LinkedIn Personal, and Facebook concurrently."""
     bible = _load_bible()
     constraints = _platform_constraints(bible)
 
     results = await asyncio.gather(
         _generate_one("x", outline, constraints, trace_id),
-        _generate_one("linkedin", outline, constraints, trace_id),
+        _generate_one("linkedin_company", outline, constraints, trace_id),
+        _generate_one("linkedin_personal", outline, constraints, trace_id),
         _generate_one("facebook", outline, constraints, trace_id),
     )
 
@@ -166,4 +201,41 @@ async def regenerate_one_platform(
     bible = _load_bible()
     constraints = _platform_constraints(bible)
     _, text = await _generate_one(platform, outline, constraints, trace_id)
+    return text
+
+
+async def refine_one_platform(
+    platform: str,
+    original_text: str,
+    refinement_instructions: str,
+    trace_id: str,
+) -> str:
+    """Refine a single platform post using feedback (agentic reflection)."""
+    bible = _load_bible()
+    constraints = _platform_constraints(bible)
+    c = constraints[platform]
+
+    prompt = _REFINE_PROMPT.format(
+        platform_upper=platform.upper(),
+        original_text=original_text,
+        refinement_instructions=refinement_instructions,
+        char_limit=c["char_limit"],
+        length_guide=c["length_guide"],
+        hashtag_rule=c["hashtag_rule"],
+        style=c["style"],
+        emoji=c["emoji"],
+    )
+
+    text = await groq_generate(prompt, GROQ_MODEL)
+    text = text.strip()
+
+    logger.info(
+        "Post refined",
+        extra={
+            "trace_id": trace_id,
+            "stage": "generation",
+            "platform": platform,
+            "char_count": len(text),
+        },
+    )
     return text

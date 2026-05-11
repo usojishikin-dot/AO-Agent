@@ -31,6 +31,12 @@ class NewsRepository:
             item.master_outline = outline
             await self.session.commit()
 
+    async def update_image_url(self, news_item_id: int, image_url: str) -> None:
+        item = await self.get_by_id(news_item_id)
+        if item:
+            item.image_url = image_url
+            await self.session.commit()
+
     async def create_news_item(
         self,
         *,

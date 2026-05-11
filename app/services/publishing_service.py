@@ -6,18 +6,25 @@ from app.db.session import AsyncSessionLocal
 from app.repositories.content_version_repository import ContentVersionRepository
 from app.repositories.news_repository import NewsRepository
 from app.services.ayrshare_client import post_to_ayrshare
-from app.services.cloudinary_service import transform_and_upload_image
 
 logger = get_logger(__name__)
 
 
 def map_platform_for_ayrshare(platform: str) -> str:
-    """Maps internal platform names to Ayrshare compatible names."""
+    """Maps internal platform names to Ayrshare compatible names.
+
+    Both linkedin_company and linkedin_personal are mapped to the single
+    "linkedin" string that Ayrshare accepts.  Profile-key routing (to
+    distinguish the company page from the personal profile) is a future
+    enhancement once Ayrshare profileKeys are collected per client.
+    """
     mapping = {
         "x": "twitter",
         "linkedin": "linkedin",
+        "linkedin_company": "linkedin",
+        "linkedin_personal": "linkedin",
         "facebook": "facebook",
-        "instagram": "instagram"
+        "instagram": "instagram",
     }
     return mapping.get(platform.lower(), platform.lower())
 
@@ -52,9 +59,7 @@ async def publish_content_version(content_version_id: int) -> bool:
             
             media_urls = []
             if news_item and news_item.image_url:
-                transformed_url = await transform_and_upload_image(news_item.image_url)
-                if transformed_url:
-                    media_urls.append(transformed_url)
+                media_urls.append(news_item.image_url)
             
             # Post to Ayrshare
             result = await post_to_ayrshare(cv.content_text, [ayrshare_platform], media_urls)

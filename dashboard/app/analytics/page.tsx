@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
             <div className={styles.insightCard}>
               <div className={styles.insightTag}>Llama 3.3 Fine-tuning</div>
               <h4>Bullet points increase engagement</h4>
-              <p>Analysis shows that LinkedIn posts utilizing formatted bullet points receive <strong>40% higher engagement</strong>. The generation prompt has been automatically adjusted to prioritize this format for future Web3 topics.</p>
+              <p>Analysis shows that LinkedIn posts utilizing formatted bullet points receive <strong>40% higher engagement</strong>. The generation prompt has been automatically adjusted to prioritize this format for impact-driven content.</p>
             </div>
             
             <div className={styles.insightCard}>
