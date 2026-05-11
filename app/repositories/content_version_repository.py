@@ -72,10 +72,14 @@ class ContentVersionRepository:
         return list(result.scalars().all())
 
     async def list_by_status(self, status: str) -> list[ContentVersion]:
+        from sqlalchemy.orm import joinedload
+        from app.db.models import NewsItem
+        
         stmt = (
             select(ContentVersion)
+            .options(joinedload(ContentVersion.news_item))
             .where(ContentVersion.status == status)
-            .order_by(ContentVersion.created_at.desc())
+            .order_by(ContentVersion.published_at.desc(), ContentVersion.created_at.desc())
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())

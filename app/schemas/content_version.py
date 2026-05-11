@@ -26,3 +26,7 @@ class ContentVersionResponse(BaseModel):
     approved_by_human: bool = False
     ayrshare_post_id: Optional[str] = None
     published_at: Optional[datetime] = None
+
+    # Joined fields
+    news_item_title: Optional[str] = None
+    news_item_image: Optional[str] = None

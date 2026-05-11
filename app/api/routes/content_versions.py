@@ -102,6 +102,8 @@ async def list_versions_for_news_item(
             approved_by_human=item.approved_by_human,
             ayrshare_post_id=item.ayrshare_post_id,
             published_at=item.published_at,
+            news_item_title=item.news_item.title if item.news_item else None,
+            news_item_image=item.news_item.image_url if item.news_item else None,
         )
         for item in items
     ]
@@ -140,6 +142,8 @@ async def list_content_versions(
             approved_by_human=item.approved_by_human,
             ayrshare_post_id=item.ayrshare_post_id,
             published_at=item.published_at,
+            news_item_title=item.news_item.title if item.news_item else None,
+            news_item_image=item.news_item.image_url if item.news_item else None,
         )
         for item in items
     ]
