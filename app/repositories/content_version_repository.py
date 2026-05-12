@@ -71,7 +71,7 @@ class ContentVersionRepository:
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def list_by_status(self, status: str, organization_id: int | None = None) -> list[ContentVersion]:
+    async def list_by_status(self, status: str) -> list[ContentVersion]:
         from sqlalchemy.orm import joinedload
         from app.db.models import NewsItem
         
@@ -79,12 +79,8 @@ class ContentVersionRepository:
             select(ContentVersion)
             .options(joinedload(ContentVersion.news_item))
             .where(ContentVersion.status == status)
+            .order_by(ContentVersion.published_at.desc(), ContentVersion.created_at.desc())
         )
-        
-        if organization_id:
-            stmt = stmt.join(NewsItem).where(NewsItem.organization_id == organization_id)
-            
-        stmt = stmt.order_by(ContentVersion.published_at.desc(), ContentVersion.created_at.desc())
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
@@ -129,20 +125,15 @@ class ContentVersionRepository:
         await self.session.commit()
         return result.rowcount > 0
 
-    async def get_voice_memory(self, platform: str, organization_id: int | None = None, limit: int = 2) -> list[ContentVersion]:
+    async def get_voice_memory(self, platform: str, limit: int = 2) -> list[ContentVersion]:
         """Fetch previously generated, high-scoring posts for few-shot examples."""
-        from app.db.models import NewsItem
-        
         stmt = (
             select(ContentVersion)
             .where(ContentVersion.platform == platform)
             .where(ContentVersion.status.in_(["PUBLISHED", "GENERATED"]))
             .where(ContentVersion.evaluation_score != None)
+            .order_by(ContentVersion.evaluation_score.desc())
+            .limit(limit)
         )
-        
-        if organization_id:
-            stmt = stmt.join(NewsItem).where(NewsItem.organization_id == organization_id)
-            
-        stmt = stmt.order_by(ContentVersion.evaluation_score.desc()).limit(limit)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())

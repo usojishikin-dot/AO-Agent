@@ -12,21 +12,19 @@ from app.services.ingestion_service import IngestionService
 router = APIRouter(tags=["news"])
 
 
-from app.db.models import Organization
-
 @router.post(
     "/news-trigger",
     response_model=IngestionResponse,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(verify_bearer_token)],
 )
 async def news_trigger(
     payload: NewsTriggerRequest,
-    organization: Organization = Depends(verify_bearer_token),
     session: AsyncSession = Depends(get_db_session),
 ) -> IngestionResponse:
     repo = NewsRepository(session)
     service = IngestionService(repo)
-    result = await service.ingest(payload, organization_id=organization.id)
+    result = await service.ingest(payload)
     return IngestionResponse(**result)
 
 

@@ -13,7 +13,7 @@ class IngestionService:
     def __init__(self, repo: NewsRepository) -> None:
         self.repo = repo
 
-    async def ingest(self, payload: NewsTriggerRequest, organization_id: int | None = None) -> dict:
+    async def ingest(self, payload: NewsTriggerRequest) -> dict:
         existing = await self.repo.get_by_external_id(payload.external_id)
 
         if existing:
@@ -36,7 +36,6 @@ class IngestionService:
         trace_id = str(uuid4())
 
         news_item = await self.repo.create_news_item(
-            organization_id=organization_id,
             external_id=payload.external_id,
             title=payload.title,
             content=payload.content,
@@ -52,7 +51,6 @@ class IngestionService:
                 "trace_id": trace_id,
                 "stage": "ingestion",
                 "external_id": payload.external_id,
-                "organization_id": organization_id,
             },
         )
 
