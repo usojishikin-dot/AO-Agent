@@ -22,7 +22,7 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const toggleSidebar = (e?: React.MouseEvent | React.HTMLAttributes<HTMLButtonElement>) => {
+  const toggleSidebar = () => {
     setIsOpen(prev => !prev);
   };
 

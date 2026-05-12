@@ -11,7 +11,7 @@
 }
 
 .mobileToggle {
-  display: none;
+  display: none; /* Hidden by default on desktop */
   position: fixed;
   top: 1.25rem;
   left: 1.25rem;
@@ -24,13 +24,11 @@
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
-  display: flex;
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   pointer-events: auto;
-  touch-action: none; /* Prevent scroll interference during tap */
   width: 48px;  /* Guaranteed hit area */
   height: 48px;
 }
