@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import settings
 from app.db.base import Base
-from app.db.models import ContentVersion, NewsItem  # noqa: F401 – ensures models are registered
+from app.db.models import Organization, User, NewsItem, ContentVersion  # ensures models are registered
 
 
 async def main() -> None:
@@ -17,7 +17,7 @@ async def main() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await engine.dispose()
-    print("\n✅ Tables created successfully: news_items, content_versions")
+    print("\n[OK] Tables created successfully.")
 
 
 if __name__ == "__main__":

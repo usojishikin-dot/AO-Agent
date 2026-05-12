@@ -40,6 +40,7 @@ class NewsRepository:
     async def create_news_item(
         self,
         *,
+        organization_id: int | None = None,
         external_id: str,
         title: str,
         content: str,
@@ -49,6 +50,7 @@ class NewsRepository:
         status: str = "RECEIVED",
     ) -> NewsItem:
         item = NewsItem(
+            organization_id=organization_id,
             external_id=external_id,
             title=title,
             content=content,
@@ -62,7 +64,10 @@ class NewsRepository:
         await self.session.refresh(item)
         return item
 
-    async def list_news_items(self) -> list[NewsItem]:
-        stmt = select(NewsItem).order_by(NewsItem.id.desc())
+    async def list_news_items(self, organization_id: int | None = None) -> list[NewsItem]:
+        stmt = select(NewsItem)
+        if organization_id:
+            stmt = stmt.where(NewsItem.organization_id == organization_id)
+        stmt = stmt.order_by(NewsItem.id.desc())
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
